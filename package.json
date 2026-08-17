@@ -1,0 +1,27 @@
+{
+  "name": "shruti",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Audio descriptions for video, spoken only when the screen shows something the narration leaves out. Built for blind and low-vision learners.",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "doctor": "npm run doctor --workspace server",
+    "dev": "concurrently -n server,client -c blue,magenta \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm run dev --workspace server",
+    "dev:client": "npm run dev --workspace client",
+    "build": "npm run build --workspace client",
+    "start": "npm run start --workspace server",
+    "test": "npm test --workspace server && npm test --workspace client",
+    "test:server": "npm test --workspace server",
+    "test:client": "npm test --workspace client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
