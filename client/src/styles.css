@@ -1,53 +1,63 @@
 /*
  * Shruti — visual design system.
  *
- * A warm, cozy aesthetic: cream paper background, terracotta + olive-green
- * accents, soft rounded cards, and a friendly cat mascot. Built on the same
- * accessibility rules the app has always kept:
+ * Midnight and amber: a dark, low-glare interface for something you mostly
+ * listen to, with amber carrying every action and teal reserved for whatever is
+ * happening *now* — a description being spoken, the moment under the playhead.
+ * Built on the same accessibility rules the app has always kept:
  *  - Focus is always visible and thick enough to find at low vision.
  *  - Every text/background pair meets WCAG AA; high-contrast mode exceeds it.
  *  - Nothing conveys meaning by colour alone (icons pair with real labels).
  *  - Hit targets are at least 44px; motion respects prefers-reduced-motion.
+ *
+ * One inversion to know about: on a dark ground the "-strong" variants are
+ * *lighter* than their base, not darker. Each one has to work both as a hover
+ * fill and as emphasis text, and on this background only a lighter tint does
+ * both.
  */
 
 :root {
-  /* Paper + surfaces */
-  --bg: #f3ead9;
-  --bg-tint: #eee3ce;
-  --surface: #fbf7ef;
-  --surface-2: #f4ecdc;
-  --surface-sunk: #efe4cf;
+  /* Night surfaces — deepest at the page, lifting toward the foreground */
+  --bg: #0e1116;
+  --bg-tint: #232a34;
+  --surface: #161b22;
+  --surface-2: #1d232c;
+  --surface-sunk: #10151b;
 
   /* Lines */
-  --border: #e6dac1;
-  --border-strong: #d8c8a8;
+  --border: #2a323d;
+  --border-strong: #3a4553;
 
   /* Ink */
-  --text: #322e27;
-  --text-muted: #7c7360;
+  --text: #e8edf4;
+  --text-muted: #9aa7b8;
 
-  /* Olive green — primary actions */
-  --primary: #55642c;
-  --primary-strong: #44521f;
-  --primary-ink: #f8f3e7;
-  --primary-soft: #e7e7cf;
+  /* Amber — primary actions */
+  --primary: #f0a830;
+  --primary-strong: #ffc05a;
+  --primary-ink: #12161c;
+  --primary-soft: #3a2c12;
 
-  /* Terracotta — accents, mascot, "live"/current states */
-  --accent: #bd4a22;
-  --accent-strong: #9a3915;
-  --accent-soft: #f6e2d3;
-  --accent-ink: #8a3414;
+  /* Teal — accents, "live"/current states, the speaking indicator */
+  --accent: #4fd1c5;
+  --accent-strong: #8fe6dc;
+  --accent-soft: #12302e;
+  --accent-ink: #7fe3d8;
+  --accent-border: #2f6b64;
 
-  --danger: #b23c1a;
-  --focus: #8a3b16;
+  --danger: #ff7a70;
+  --danger-soft: #351a1c;
+  --focus: #ffc05a;
 
   --radius: 16px;
   --radius-sm: 11px;
   --radius-lg: 22px;
   --radius-pill: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(74, 55, 28, 0.04);
-  --shadow: 0 1px 3px rgba(74, 55, 28, 0.05);
+  /* On a dark ground a shadow reads as depth only if it is genuinely dark;
+     the near-transparent shadows a paper theme uses disappear entirely. */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
 
   /* Nunito Sans and Fraunces carry no Bengali glyphs, so Noto Sans Bengali
      follows each of them in the stack: Latin text keeps the intended face and
@@ -57,7 +67,7 @@
   --font-display: 'Fraunces', 'Noto Sans Bengali', Georgia, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 :root[data-contrast='high'] {
@@ -78,7 +88,9 @@
   --accent-strong: #ff9d5c;
   --accent-soft: #1a1a1a;
   --accent-ink: #ff9d5c;
+  --accent-border: #ffffff;
   --danger: #ff8a6b;
+  --danger-soft: #1a1a1a;
   --focus: #ffec3d;
   --shadow-sm: none;
   --shadow: none;
@@ -141,7 +153,7 @@ body {
   left: -9999px;
   top: 0;
   background: var(--accent);
-  color: #fff;
+  color: var(--primary-ink);
   padding: 0.75rem 1rem;
   font-weight: 800;
   border-radius: 0 0 var(--radius-sm) 0;
@@ -441,7 +453,7 @@ main:focus {
 .error:not(:empty) {
   color: var(--danger);
   font-weight: 700;
-  background: var(--accent-soft);
+  background: var(--danger-soft);
   border-left: 4px solid var(--danger);
   padding: 0.6rem 0.75rem;
   border-radius: var(--radius-sm);
@@ -490,7 +502,9 @@ select {
   appearance: none;
   -webkit-appearance: none;
   padding-right: 2.6rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23322e27' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E");
+  /* The chevron is baked into a data URI, so its colour cannot follow
+     currentColor — it is the light ink, which reads on both themes. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23e8edf4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.7rem center;
   cursor: pointer;
@@ -668,7 +682,7 @@ legend {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), #6d7d3c);
+  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
   border-radius: var(--radius-pill);
   transition: width 0.4s ease;
 }
@@ -704,7 +718,7 @@ legend {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #14110c;
+  background: #05070a;
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -757,7 +771,7 @@ legend {
   margin: 0 0 1rem;
   padding: 0.6rem 0.9rem;
   background: var(--accent-soft);
-  border: 1.5px solid #ecc9b3;
+  border: 1.5px solid var(--accent-border);
   border-radius: var(--radius-sm);
   font-weight: 700;
   color: var(--accent-ink);
@@ -1129,7 +1143,7 @@ legend {
 .dialog-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(40, 28, 14, 0.5);
+  background: rgba(3, 5, 9, 0.66);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
@@ -1259,22 +1273,22 @@ legend {
 
 .mic-btn.listening {
   background: var(--accent);
-  color: #fff;
+  color: var(--primary-ink);
   border-color: var(--accent);
   animation: pulse 1.3s ease-in-out infinite;
 }
 
 .mic-btn.listening .icon {
-  color: #fff;
+  color: var(--primary-ink);
 }
 
 @keyframes pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(189, 74, 34, 0.45);
+    box-shadow: 0 0 0 0 rgba(79, 209, 197, 0.45);
   }
   50% {
-    box-shadow: 0 0 0 7px rgba(189, 74, 34, 0);
+    box-shadow: 0 0 0 7px rgba(79, 209, 197, 0);
   }
 }
 
@@ -1401,11 +1415,11 @@ legend {
 }
 
 .voice-overlay.voice-error {
-  border-color: var(--danger, #b3261e);
+  border-color: var(--danger, #ff7a70);
 }
 
 .voice-overlay.voice-error .voice-overlay-text strong {
-  color: var(--danger, #b3261e);
+  color: var(--danger, #ff7a70);
 }
 
 /* The Asking-Gemma pill can carry a long question — keep it to one tidy line. */
