@@ -108,7 +108,7 @@ export function QuestionPanel({ presets, onAsk, busy, lastAnswer, disabled }) {
           role="region"
           aria-label={t('questions.answerRegion')}
         >
-          <img className="answer-avatar" src="/cat-face.png" alt="" />
+          <img className="answer-avatar" src="/logo.svg" alt="" />
           <p className="answer-question">
             {t('questions.youAsked')} <strong>{lastAnswer.question}</strong>
           </p>

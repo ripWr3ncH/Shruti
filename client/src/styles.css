@@ -183,9 +183,11 @@ body {
   gap: 0.9rem;
 }
 
+/* The mark is a square badge, so it sits closer to the wordmark's own height
+   than the wider illustration it replaced. */
 .brand-logo {
-  width: 78px;
-  height: 78px;
+  width: 54px;
+  height: 54px;
   object-fit: contain;
   flex: none;
 }
@@ -1080,8 +1082,8 @@ legend {
 }
 
 .timeline-empty img {
-  width: 88px;
-  height: auto;
+  width: 64px;
+  height: 64px;
   flex: none;
 }
 
@@ -1563,8 +1565,8 @@ a {
     gap: 0.7rem;
   }
   .brand-logo {
-    width: 54px;
-    height: 54px;
+    width: 42px;
+    height: 42px;
   }
   .wordmark {
     font-size: 1.6rem;

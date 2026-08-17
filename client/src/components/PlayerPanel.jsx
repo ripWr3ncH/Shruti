@@ -125,7 +125,7 @@ export const PlayerPanel = forwardRef(function PlayerPanel(
           learner always knows the skip and replay keys are available. */}
       {speaking && (
         <p className="speaking-banner" aria-hidden="true">
-          <img src="/cat-headphones.png" alt="" />
+          <img src="/logo.svg" alt="" />
           <span>{t('player.speakingBanner', { skip: 'S', replay: 'R' })}</span>
           <span className="speaking-wave" aria-hidden="true">
             <span />

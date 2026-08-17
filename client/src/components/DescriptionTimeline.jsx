@@ -16,7 +16,7 @@ export function DescriptionTimeline({ descriptions, currentTime, onJump, stats }
       <section className="panel timeline" aria-labelledby="timeline-heading">
         <h2 id="timeline-heading">{t('timeline.heading')}</h2>
         <div className="timeline-empty">
-          <img src="/cat-rest.png" alt="" />
+          <img src="/logo.svg" alt="" />
           <p>{t('timeline.empty')}</p>
         </div>
       </section>

@@ -733,7 +733,7 @@ export default function App() {
 
       <header className="app-header">
         <div className="brand">
-          <img className="brand-logo" src="/cat-headphones.png" alt="" />
+          <img className="brand-logo" src="/logo.svg" alt="" />
           <div>
             <h1 className="wordmark">Shruti</h1>
             <p className="tagline">{t('app.tagline')}</p>
@@ -835,7 +835,7 @@ export default function App() {
 
       <footer className="app-footer">
         <div className="footer-brand">
-          <img src="/cat-face.png" alt="" />
+          <img src="/logo.svg" alt="" />
           <p>{t('app.footerModel', { model: modelInfo?.model || 'Gemma' })}</p>
         </div>
         <div className="footer-actions">
@@ -872,7 +872,7 @@ export default function App() {
 
       {(voice.listening || voice.busy || voice.error) && (
         <div className={`voice-overlay${voice.error ? ' voice-error' : ''}`} role="status">
-          <img src="/cat-headphones.png" alt="" />
+          <img src="/logo.svg" alt="" />
           <div className="voice-overlay-text">
             <strong>
               {voice.error
@@ -905,7 +905,7 @@ export default function App() {
           so there is immediate visual feedback while Gemma looks at the frame. */}
       {asking && (
         <div className="voice-overlay asking-overlay" role="status">
-          <img src="/cat-face.png" alt="" />
+          <img src="/logo.svg" alt="" />
           <div className="voice-overlay-text">
             <strong>{speech.speaking ? t('voice.answering') : t('voice.askingGemma')}</strong>
             {askQuestion && <span>{askQuestion}</span>}
