@@ -14,6 +14,8 @@ in the natural pauses, never over the instructor.
 The interface and the descriptions are available in **English and বাংলা**, switchable from one
 control.
 
+![Shruti — audio descriptions for blind and low-vision learners, spoken only where the narration leaves a gap](docs/images/slide1.png)
+
 <!-- TODO(screenshot): landing screen — the URL form and the ready-to-play list.
      Save as docs/images/landing.png, then uncomment the line below. -->
 <!-- ![Shruti's landing screen](docs/images/landing.png) -->
@@ -35,6 +37,8 @@ For a blind or low‑vision learner, the existing options both fail:
 
 Neither is usable for actually *learning*. The result is that visual tutorials — some of the best
 free education available — are effectively closed to millions of learners.
+
+![Screen readers read only the words; describe-everything tools talk over the instructor. Shruti instead asks whether the learner can follow the lesson without seeing the screen](docs/images/slide3.png)
 
 ## What Shruti does
 
@@ -64,6 +68,10 @@ The design rule behind everything: **silence is better than a wrong description.
 - **English and বাংলা.** The whole interface — menus, controls, screen‑reader announcements — plus
   the descriptions and answers themselves, switchable from one control. See
   [Languages & voices](#languages--voices).
+- **Picks up where you left off.** The position in each video is remembered locally and offered
+  back on the next visit — announced, with the key that undoes it, rather than silently applied.
+- **Take the descriptions with you.** Download a prepared timeline as plain text for revision, or
+  as a WebVTT description track any player can load. Generated in the browser, so it costs nothing.
 - **Accessible by construction.** Full keyboard control, screen‑reader announcements, WCAG‑AA
   contrast, a high‑contrast mode, and native controls throughout.
 - **Runs on your own machine.** Gemma is open‑weight, so the same model that runs hosted can run
@@ -78,6 +86,10 @@ The design rule behind everything: **silence is better than a wrong description.
 ---
 
 ## How it works
+
+![The four stages of the pipeline: ingest with yt-dlp, understand the whole transcript with Gemma, decide and describe each candidate frame, then deliver the cached timeline into the narration gaps](docs/images/slide2.png)
+
+The same pipeline in full detail:
 
 ```
 YouTube URL / spoken search
@@ -134,6 +146,8 @@ never as a guess.
 
 A near‑duplicate check runs over what has already been accepted, so a graph that stays on screen for
 five minutes is described once rather than three times.
+
+![The three outcomes for any moment — silence, a brief pointer, or an extended explanation that pauses the video — and the confidence thresholds that choose between them](docs/images/slide4.png)
 
 The invariants that hold all of this together are written down in
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
@@ -321,6 +335,8 @@ You can also deep‑link a video: `http://localhost:5175/?v=<id-or-url>`.
 Accessibility is part of the MVP, not a later pass. The whole application is operable with a keyboard
 and a screen reader, and nothing requires sight.
 
+![Six commitments: nothing needs sight, ask about the current frame, English and Bangla, never talking over the teacher, a free second viewing, and finding a video by speaking](docs/images/slide5.png)
+
 - Skip link, landmark structure, and a heading hierarchy that matches the visual one.
 - Two ARIA live regions: polite for progress and state, assertive for errors and answers.
 - Every control is a native `button`, `input`, or `select` — no custom widgets to get wrong.
@@ -338,7 +354,8 @@ and a screen reader, and nothing requires sight.
 | `Space` / `K` | Play or pause |
 | `←` / `→` | Back / forward 5 seconds |
 | `J` / `L` | Back / forward 10 seconds |
-| `Home` | Back to the start |
+| `Home` | Back to the start (and forget the saved position) |
+| `-` / `=` | Slow the video down / speed it up |
 | `M` | Mute the video |
 | `T` | Say the current position |
 | `D` | Audio descriptions on / off |
@@ -524,8 +541,8 @@ client/
   key and no network at all.
 - **Server‑side speech** — synthesise descriptions on the server, so spoken output stops depending
   on the viewer's browser having a voice.
-- **Shareable timelines** — export and import a processed timeline so a described video can be handed
-  to another learner with zero recompute.
+- **Shareable timelines** — *import* a downloaded timeline (export already ships), so a described
+  video can be handed to another learner with zero recompute.
 - **Multi‑frame reasoning** — sample a short window per moment so changes that unfold over several
   seconds are captured, not just single frames.
 

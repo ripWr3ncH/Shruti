@@ -52,3 +52,6 @@ DEMO_SCRIPT.md
 
 # --- Deploy tooling -------------------------------------------------------
 .vercel
+
+# --- Slide deck source (screenshots of it are what ships, in docs/images) --
+slides/

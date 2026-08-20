@@ -6,6 +6,25 @@ and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Video playback speed, separate from the speech rate: `-` and `=`, or the select in the player.
+  A learner who wants the instructor at 1.5x usually still wants descriptions read unhurried.
+  Remembered across videos and sessions.
+- Resume where you left off. The position in each video is kept locally and offered back on the
+  next visit, announced with the position and the key that undoes it. `Home` clears it.
+- Download the prepared descriptions as plain text or as a WebVTT description track, generated in
+  the browser from the timeline already on screen.
+- A filter over the description list, so finding a moment in a long lecture no longer means
+  reading the whole list. The match count is announced.
+
+### Changed
+
+- New visual design: a lilac ground with white cards, violet actions, a teal "live" accent,
+  Poppins with a handwritten Caveat accent line, and hand-drawn background squiggles. Card
+  entrances, button lift, a drifting progress stripe, and a floating mark — all switched off by
+  `prefers-reduced-motion`. High-contrast mode is unchanged and additionally drops the script face.
+
 ### Planned
 
 - Pluggable vision backend, with local Gemma via Ollama as the default engine.
