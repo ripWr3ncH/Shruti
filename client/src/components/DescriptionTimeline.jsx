@@ -1,15 +1,37 @@
+import { useMemo, useState } from 'react';
 import { formatTime } from '../lib/format.js';
 import Icon from './Icon.jsx';
 import { useI18n, spokenTime } from '../i18n/index.jsx';
+
+/** Below this many descriptions, a filter box is more clutter than help. */
+const FILTER_THRESHOLD = 6;
 
 /**
  * Every description Shruti prepared, as a navigable list.
  *
  * This doubles as the transparency surface: a learner can review exactly what
  * the AI will say and when, and jump to any of it.
+ *
+ * Two things make it usable on a long lecture rather than just honest. A filter
+ * turns the list into a way to *find* a moment — "the part about gradients" —
+ * which for a blind learner replaces scrubbing a timeline by eye. And the
+ * export buttons let the timeline leave the browser: it costs minutes of
+ * processing and a run of Gemma calls to produce, and until now it only existed
+ * in one tab.
  */
-export function DescriptionTimeline({ descriptions, currentTime, onJump, stats }) {
+export function DescriptionTimeline({ descriptions, currentTime, onJump, stats, onExport }) {
   const { t } = useI18n();
+  const [filter, setFilter] = useState('');
+
+  const query = filter.trim().toLowerCase();
+  const visible = useMemo(() => {
+    if (!query) return descriptions;
+    return descriptions.filter(
+      (entry) =>
+        entry.description.toLowerCase().includes(query) ||
+        formatTime(entry.time).includes(query),
+    );
+  }, [descriptions, query]);
 
   if (!descriptions.length) {
     return (
@@ -39,8 +61,47 @@ export function DescriptionTimeline({ descriptions, currentTime, onJump, stats }
         )}
       </div>
 
+      <div className="timeline-tools">
+        {descriptions.length >= FILTER_THRESHOLD && (
+          <div className="timeline-filter">
+            <label htmlFor="timeline-filter">{t('timeline.filterLabel')}</label>
+            <input
+              id="timeline-filter"
+              type="text"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+              placeholder={t('timeline.filterPlaceholder')}
+              autoComplete="off"
+            />
+          </div>
+        )}
+
+        {onExport && (
+          <div className="timeline-export" role="group" aria-label={t('timeline.exportGroup')}>
+            <button type="button" className="secondary" onClick={() => onExport('text')}>
+              <Icon name="external" size={16} />
+              {t('timeline.exportText')}
+            </button>
+            <button type="button" className="secondary" onClick={() => onExport('vtt')}>
+              <Icon name="external" size={16} />
+              {t('timeline.exportVtt')}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* The match count is a live region: filtering is a silent visual change
+          otherwise, and someone typing here cannot see the list shrink. */}
+      {query !== '' && (
+        <p className="timeline-filter-count" role="status">
+          {visible.length === 0
+            ? t('timeline.filterNone', { query: filter.trim() })
+            : t('timeline.filterCount', { count: visible.length })}
+        </p>
+      )}
+
       <ol className="description-list">
-        {descriptions.map((entry) => {
+        {visible.map((entry) => {
           const isCurrent = currentTime >= entry.time && currentTime < entry.time + 4;
           const isExplain = entry.mode === 'explain';
           const delivery = isExplain

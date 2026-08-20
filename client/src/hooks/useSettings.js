@@ -6,6 +6,12 @@ const STORAGE_KEY = 'shruti.settings.v1';
 export const DEFAULT_SETTINGS = {
   /** Speech rate for descriptions and answers. */
   rate: 1.1,
+  /**
+   * Playback rate for the video itself. Separate from `rate` on purpose: a
+   * learner who wants the instructor at 1.5x very often still wants the
+   * descriptions read at a normal, unhurried speed.
+   */
+  videoRate: 1,
   volume: 1,
   voiceURI: '',
   /** Master switch for automatic audio descriptions. */

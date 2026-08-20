@@ -16,6 +16,13 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import api, { apiUrl } from './lib/api.js';
+import { clearProgress, loadProgress, saveProgress } from './lib/progress.js';
+import {
+  descriptionsToText,
+  descriptionsToVtt,
+  downloadText,
+  safeFileName,
+} from './lib/export.js';
 import useAnnouncer from './hooks/useAnnouncer.js';
 import useSettings from './hooks/useSettings.js';
 import useSpeech from './hooks/useSpeech.js';
@@ -294,6 +301,36 @@ export default function App() {
     return () => clearInterval(timer);
   }, [phase, ready, controls]);
 
+  // The video keeps whatever speed the learner last chose, across videos and
+  // across sessions. Re-applied whenever a player is (re)created, because a
+  // fresh YouTube player always starts at 1x.
+  useEffect(() => {
+    if (phase === 'ready' && ready) controls.setPlaybackRate(settings.videoRate);
+  }, [phase, ready, controls, settings.videoRate]);
+
+  // Remember the position every few seconds rather than on every clock tick —
+  // this is a localStorage write, and 250ms of granularity buys nothing.
+  //
+  // The last live reading is kept in a local rather than re-queried on the way
+  // out: the YouTube player is destroyed before this cleanup runs, so a
+  // last-moment getTime() reads 0, which saveProgress treats as "back at the
+  // start" and erases the very position we are here to keep.
+  useEffect(() => {
+    if (phase !== 'ready' || !ready || !videoId) return undefined;
+    const last = { time: 0, duration: 0 };
+    const timer = setInterval(() => {
+      const at = controls.getTime();
+      if (at <= 0) return;
+      last.time = at;
+      last.duration = controls.getDuration();
+      saveProgress(videoId, last.time, last.duration);
+    }, 5000);
+    return () => {
+      clearInterval(timer);
+      if (last.time > 0) saveProgress(videoId, last.time, last.duration);
+    };
+  }, [phase, ready, videoId, controls]);
+
   useEffect(() => {
     if (playerError) report(playerError, { assertive: true });
   }, [playerError, report]);
@@ -305,6 +342,17 @@ export default function App() {
         ? t('announce.readyOne')
         : t('announce.readyMany', { count: descriptions.length }),
     );
+    // Pick up where this learner left off. Offered rather than imposed: the
+    // announcement names the position and the key that undoes it, because
+    // silently starting a video eight minutes in is disorienting when you
+    // cannot see the scrubber.
+    const resumeAt = loadProgress(videoId, duration || info?.duration || 0);
+    if (resumeAt != null) {
+      controls.seekTo(resumeAt);
+      setCurrentTime(resumeAt);
+      report(t('announce.resumed', { position: sayTime(resumeAt) }), { assertive: true });
+    }
+
     // The processing job was itself started by a real click, but that user
     // gesture is long expired by the time the video finishes preparing, so
     // browsers are free to block this autoplay. Try it anyway, then check
@@ -590,6 +638,66 @@ export default function App() {
     [t],
   );
 
+  /**
+   * Video speed. Distinct from the speech rate on `,` and `.`: this one moves
+   * the instructor, that one moves Shruti.
+   */
+  const setVideoRate = useCallback(
+    (value) => {
+      const next = Math.max(0.25, Math.min(2, Number(value) || 1));
+      update({ videoRate: next });
+      controls.setPlaybackRate(next);
+      announce(t('announce.videoRate', { rate: next }));
+    },
+    [update, controls, announce, t],
+  );
+
+  /** Step through the offered speeds, so the keys land on the same values the
+   *  select offers rather than on arbitrary decimals. */
+  const nudgeVideoRate = useCallback(
+    (direction) => {
+      const steps = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+      const nearest = steps.reduce((best, step) =>
+        Math.abs(step - settings.videoRate) < Math.abs(best - settings.videoRate) ? step : best,
+      );
+      const index = Math.max(0, Math.min(steps.length - 1, steps.indexOf(nearest) + direction));
+      setVideoRate(steps[index]);
+    },
+    [settings.videoRate, setVideoRate],
+  );
+
+  /**
+   * Hand the prepared timeline to the learner as a file. Generated here, in the
+   * browser, from what is already on screen — so it always matches, and it
+   * costs no request.
+   */
+  const handleExport = useCallback(
+    (format) => {
+      if (!descriptions.length) return;
+      const meta = {
+        title: info?.title,
+        model: modelInfo?.model,
+        language: activeLanguage?.name,
+        url: videoId ? 'https://www.youtube.com/watch?v=' + videoId : '',
+      };
+      if (format === 'vtt') {
+        downloadText(
+          safeFileName(info?.title, 'vtt'),
+          'text/vtt',
+          descriptionsToVtt(descriptions, meta),
+        );
+      } else {
+        downloadText(
+          safeFileName(info?.title, 'txt'),
+          'text/plain',
+          descriptionsToText(descriptions, meta),
+        );
+      }
+      report(t('announce.exported'));
+    },
+    [descriptions, info, modelInfo, activeLanguage, videoId, report, t],
+  );
+
   /* -------------------------------------------------------------- shortcuts */
 
   const bindings = useMemo(() => {
@@ -604,7 +712,29 @@ export default function App() {
       { keys: ['ArrowRight'], label: t('shortcuts.forward5'), group: playback, run: () => seekBy(5) },
       { keys: ['j'], label: t('shortcuts.back10'), group: playback, run: () => seekBy(-10) },
       { keys: ['l'], label: t('shortcuts.forward10'), group: playback, run: () => seekBy(10) },
-      { keys: ['Home'], label: t('shortcuts.toStart'), group: playback, run: () => seekTo(0) },
+      {
+        keys: ['Home'],
+        label: t('shortcuts.toStart'),
+        group: playback,
+        run: () => {
+          // Going back to the beginning is an explicit "start over" — drop the
+          // saved position so the next visit does not undo it.
+          clearProgress(videoId);
+          seekTo(0);
+        },
+      },
+      {
+        keys: ['-', '_'],
+        label: t('shortcuts.videoSlower'),
+        group: playback,
+        run: () => nudgeVideoRate(-1),
+      },
+      {
+        keys: ['=', '+'],
+        label: t('shortcuts.videoFaster'),
+        group: playback,
+        run: () => nudgeVideoRate(1),
+      },
       { keys: ['m'], label: t('shortcuts.mute'), group: playback, run: toggleMute },
       {
         keys: ['t'],
@@ -681,6 +811,8 @@ export default function App() {
     seekBy,
     seekTo,
     toggleMute,
+    nudgeVideoRate,
+    videoId,
     toggleDescriptions,
     skipSpeech,
     changeRate,
@@ -796,6 +928,8 @@ export default function App() {
               descriptionCount={descriptions.length}
               muted={muted}
               speaking={speech.speaking}
+              videoRate={settings.videoRate}
+              onVideoRateChange={setVideoRate}
               onPlayPause={togglePlay}
               onSeek={seekTo}
               onSeekBy={seekBy}
@@ -819,6 +953,7 @@ export default function App() {
               descriptions={descriptions}
               currentTime={currentTime}
               stats={timeline?.stats}
+              onExport={handleExport}
               onJump={(entry) => {
                 scheduler.jumpTo(entry);
                 announce(t('announce.jumped', { position: sayTime(entry.time) }));

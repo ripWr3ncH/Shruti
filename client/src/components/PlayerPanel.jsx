@@ -3,6 +3,10 @@ import { formatTime } from '../lib/format.js';
 import Icon from './Icon.jsx';
 import { useI18n, spokenTime } from '../i18n/index.jsx';
 
+/** Speeds offered for the video itself. Wide enough to be useful, short enough
+ * to move through with the arrow keys. */
+const VIDEO_RATES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+
 /**
  * The video and its transport controls.
  *
@@ -31,6 +35,8 @@ export const PlayerPanel = forwardRef(function PlayerPanel(
     onRepeat,
     onSkip,
     speaking,
+    videoRate,
+    onVideoRateChange,
   },
   playButtonRef,
 ) {
@@ -157,6 +163,26 @@ export const PlayerPanel = forwardRef(function PlayerPanel(
         <p className="sr-only" aria-live="off">
           {position}
         </p>
+      </div>
+
+      {/* Video speed is a native select rather than a pair of nudge buttons:
+          it announces its own value, it is one tab stop instead of two, and it
+          reaches any speed in a single interaction. The keyboard shortcuts do
+          the same job for anyone who prefers them. */}
+      <div className="player-extras">
+        <label htmlFor="video-rate">{t('player.videoSpeed')}</label>
+        <select
+          id="video-rate"
+          value={String(videoRate)}
+          onChange={(event) => onVideoRateChange(Number(event.target.value))}
+          aria-keyshortcuts="Minus Equal"
+        >
+          {VIDEO_RATES.map((rate) => (
+            <option key={rate} value={String(rate)}>
+              {rate === 1 ? t('player.videoSpeedNormal') : t('player.videoSpeedValue', { rate })}
+            </option>
+          ))}
+        </select>
       </div>
     </section>
   );
