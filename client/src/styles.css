@@ -1,73 +1,76 @@
 /*
  * Shruti — visual design system.
  *
- * Midnight and amber: a dark, low-glare interface for something you mostly
- * listen to, with amber carrying every action and teal reserved for whatever is
- * happening *now* — a description being spoken, the moment under the playhead.
- * Built on the same accessibility rules the app has always kept:
+ * A friendly, illustrated study aesthetic: a soft lilac ground, white cards
+ * with generous corners, violet for every action, and hand-drawn squiggles in
+ * the background. Headings pair a heavy geometric sans with a handwritten
+ * script for one accent word, the way a good course poster does.
+ *
+ * None of that is allowed to cost accessibility, which is the whole product:
  *  - Focus is always visible and thick enough to find at low vision.
  *  - Every text/background pair meets WCAG AA; high-contrast mode exceeds it.
+ *  - The script face is decorative only — never a control, never body text —
+ *    and high-contrast mode replaces it with the plain body face.
  *  - Nothing conveys meaning by colour alone (icons pair with real labels).
- *  - Hit targets are at least 44px; motion respects prefers-reduced-motion.
- *
- * One inversion to know about: on a dark ground the "-strong" variants are
- * *lighter* than their base, not darker. Each one has to work both as a hover
- * fill and as emphasis text, and on this background only a lighter tint does
- * both.
+ *  - Hit targets are at least 44px; every animation stops dead under
+ *    prefers-reduced-motion.
  */
 
 :root {
-  /* Night surfaces — deepest at the page, lifting toward the foreground */
-  --bg: #0e1116;
-  --bg-tint: #232a34;
-  --surface: #161b22;
-  --surface-2: #1d232c;
-  --surface-sunk: #10151b;
+  /* Paper + surfaces — a lilac ground with white cards floating on it */
+  --bg: #f1edfb;
+  --bg-tint: #e9e2f9;
+  --surface: #ffffff;
+  --surface-2: #f7f4fd;
+  --surface-sunk: #ece5fa;
 
   /* Lines */
-  --border: #2a323d;
-  --border-strong: #3a4553;
+  --border: #e6dff8;
+  --border-strong: #d3c8f0;
 
   /* Ink */
-  --text: #e8edf4;
-  --text-muted: #9aa7b8;
+  --text: #221d33;
+  --text-muted: #6b6484;
 
-  /* Amber — primary actions */
-  --primary: #f0a830;
-  --primary-strong: #ffc05a;
-  --primary-ink: #12161c;
-  --primary-soft: #3a2c12;
+  /* Violet — primary actions */
+  --primary: #7c5cd6;
+  --primary-strong: #6746c0;
+  --primary-ink: #ffffff;
+  --primary-soft: #ece4fb;
 
-  /* Teal — accents, "live"/current states, the speaking indicator */
-  --accent: #4fd1c5;
-  --accent-strong: #8fe6dc;
-  --accent-soft: #12302e;
-  --accent-ink: #7fe3d8;
-  --accent-border: #2f6b64;
+  /* Teal — accents and "live"/current states. `--accent` is a fill and stroke
+     colour only (3.3:1, enough for a graphic, not for text); anything that has
+     to be *read* uses `--accent-ink`. */
+  --accent: #2c9aa6;
+  --accent-strong: #1c7b86;
+  --accent-soft: #e0f4f6;
+  --accent-ink: #17656f;
+  --accent-border: #a8dee4;
 
-  --danger: #ff7a70;
-  --danger-soft: #351a1c;
-  --focus: #ffc05a;
+  --danger: #c9384a;
+  --danger-soft: #fdecee;
+  --focus: #5b39b8;
 
-  --radius: 16px;
-  --radius-sm: 11px;
-  --radius-lg: 22px;
+  /* Rounder than a utility interface would be — it is the single strongest
+     carrier of the illustrated feel, so it is worth the pixels. */
+  --radius: 20px;
+  --radius-sm: 14px;
+  --radius-lg: 28px;
   --radius-pill: 999px;
 
-  /* On a dark ground a shadow reads as depth only if it is genuinely dark;
-     the near-transparent shadows a paper theme uses disappear entirely. */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 2px 6px rgba(84, 58, 158, 0.06);
+  --shadow: 0 12px 34px rgba(84, 58, 158, 0.13);
+  --shadow-lift: 0 16px 30px rgba(84, 58, 158, 0.18);
 
-  /* Nunito Sans and Fraunces carry no Bengali glyphs, so Noto Sans Bengali
-     follows each of them in the stack: Latin text keeps the intended face and
-     Bengali text falls through to one designed for it, rather than to whatever
-     the operating system happens to have. */
-  --font-body: 'Nunito Sans', 'Noto Sans Bengali', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Fraunces', 'Noto Sans Bengali', Georgia, 'Times New Roman', serif;
+  /* Poppins carries no Bengali glyphs, so Noto Sans Bengali follows it in every
+     stack: Latin text keeps the intended face and Bengali text falls through to
+     one designed for it, rather than to whatever the OS happens to have. */
+  --font-body: 'Poppins', 'Noto Sans Bengali', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Poppins', 'Noto Sans Bengali', system-ui, 'Segoe UI', sans-serif;
+  --font-script: 'Caveat', 'Noto Sans Bengali', 'Segoe Script', cursive;
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 :root[data-contrast='high'] {
@@ -94,6 +97,9 @@
   --focus: #ffec3d;
   --shadow-sm: none;
   --shadow: none;
+  --shadow-lift: none;
+  /* A handwriting face is the first thing to go when legibility is the point. */
+  --font-script: 'Poppins', 'Noto Sans Bengali', system-ui, sans-serif;
   color-scheme: dark;
 }
 
@@ -105,7 +111,15 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
+  /* Two soft violet blooms and a field of hand-drawn squiggles, all baked into
+     data URIs so the page stays self-contained and needs no image requests.
+     Purely decorative: it sits behind everything and carries no meaning. */
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(38rem 26rem at 12% -6%, rgba(124, 92, 214, 0.16), transparent 70%),
+    radial-gradient(32rem 24rem at 92% 4%, rgba(44, 154, 166, 0.13), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='300' fill='none' stroke='%237c5cd6' stroke-opacity='0.14' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M-10 54c26-22 52 22 78 0s52-22 78 0 52 22 78 0 52-22 78 0'/%3E%3Cpath d='M-10 236c26-22 52 22 78 0s52-22 78 0 52 22 78 0 52-22 78 0'/%3E%3Ccircle cx='300' cy='140' r='6'/%3E%3Ccircle cx='60' cy='160' r='9'/%3E%3Cpath d='M150 120c14-10 28 10 42 0'/%3E%3C/svg%3E");
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-body);
   font-size: 17px;
@@ -126,7 +140,7 @@ body {
   vertical-align: middle;
 }
 
-/* Cat mascot art keeps its own proportions wherever it appears. */
+/* The mark keeps its own proportions wherever it appears. */
 .brand-logo,
 .brand-cat,
 .speaking-banner img,
@@ -152,7 +166,7 @@ body {
   position: absolute;
   left: -9999px;
   top: 0;
-  background: var(--accent);
+  background: var(--primary);
   color: var(--primary-ink);
   padding: 0.75rem 1rem;
   font-weight: 800;
@@ -202,22 +216,28 @@ body {
   height: 54px;
   object-fit: contain;
   flex: none;
+  animation: mark-float 5s ease-in-out infinite;
 }
 
 .wordmark {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 2rem;
+  font-weight: 800;
+  font-size: 2.1rem;
   line-height: 1;
-  letter-spacing: -0.01em;
-  color: var(--primary);
+  letter-spacing: -0.03em;
+  color: var(--text);
 }
 
+/* The one handwritten line on the page, set the way a course poster sets its
+   subtitle. Decorative by role — the sentence is still real text, so a screen
+   reader reads it exactly as it always did. */
 .tagline {
-  margin: 0.3rem 0 0;
-  color: var(--text-muted);
-  font-size: 0.98rem;
+  margin: 0.1rem 0 0;
+  color: var(--primary-strong);
+  font-family: var(--font-script);
+  font-size: 1.45rem;
+  line-height: 1.1;
   max-width: 34ch;
 }
 
@@ -415,10 +435,22 @@ main:focus {
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 1.6rem 1.7rem;
-  box-shadow: none;
+  border-radius: var(--radius-lg);
+  padding: 1.7rem 1.8rem;
+  box-shadow: var(--shadow);
   margin: 0;
+  /* Cards arrive rather than appear. Staggered below, killed entirely under
+     prefers-reduced-motion. */
+  animation: card-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ready-layout > .panel:nth-child(2) { animation-delay: 0.07s; }
+.ready-layout > .panel:nth-child(3) { animation-delay: 0.14s; }
+.stage > .panel:nth-child(2) { animation-delay: 0.07s; }
+
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
 }
 
 .stage .panel {
@@ -431,8 +463,9 @@ main:focus {
   gap: 0.55rem;
   margin: 0 0 1.1rem;
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.2rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
   color: var(--text);
 }
 
@@ -491,6 +524,15 @@ textarea {
   background: var(--surface-2);
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type='url']:focus,
+input[type='text']:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(124, 92, 214, 0.14);
 }
 
 input::placeholder {
@@ -525,22 +567,26 @@ button {
   font-weight: 700;
   color: var(--text);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-pill);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.16s ease,
+    background-color 0.15s ease, border-color 0.15s ease;
 }
 
 button:hover:not(:disabled) {
   background: var(--bg-tint);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 button:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 button:disabled {
@@ -552,11 +598,13 @@ button.primary {
   background: var(--primary);
   color: var(--primary-ink);
   border-color: var(--primary);
+  box-shadow: 0 8px 18px rgba(124, 92, 214, 0.28);
 }
 
 button.primary:hover:not(:disabled) {
   background: var(--primary-strong);
   border-color: var(--primary-strong);
+  box-shadow: var(--shadow-lift);
 }
 
 button.secondary {
@@ -682,7 +730,16 @@ legend {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--primary-strong));
+  /* The stripe drifts while work is happening, so a sighted learner can tell a
+     slow stage from a stalled one. */
+  background: linear-gradient(
+    100deg,
+    var(--primary) 0%,
+    var(--primary-strong) 40%,
+    var(--accent) 100%
+  );
+  background-size: 200% 100%;
+  animation: progress-drift 2.6s linear infinite;
   border-radius: var(--radius-pill);
   transition: width 0.4s ease;
 }
@@ -718,9 +775,9 @@ legend {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #05070a;
+  background: #0b0910;
   border: 1.5px solid var(--border-strong);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   overflow: hidden;
   margin-bottom: 1rem;
 }
@@ -747,6 +804,7 @@ legend {
   text-align: center;
   line-height: 1.15;
   border-color: transparent;
+  border-radius: var(--radius-sm);
   background: var(--surface-2);
 }
 
@@ -1272,23 +1330,23 @@ legend {
 }
 
 .mic-btn.listening {
-  background: var(--accent);
-  color: var(--primary-ink);
-  border-color: var(--accent);
+  background: var(--accent-ink);
+  color: #ffffff;
+  border-color: var(--accent-ink);
   animation: pulse 1.3s ease-in-out infinite;
 }
 
 .mic-btn.listening .icon {
-  color: var(--primary-ink);
+  color: #ffffff;
 }
 
 @keyframes pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(79, 209, 197, 0.45);
+    box-shadow: 0 0 0 0 rgba(44, 154, 166, 0.45);
   }
   50% {
-    box-shadow: 0 0 0 7px rgba(79, 209, 197, 0);
+    box-shadow: 0 0 0 7px rgba(44, 154, 166, 0);
   }
 }
 
@@ -1626,5 +1684,105 @@ a {
   .speaking-wave span {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+
+/* --- Video speed ---------------------------------------------------------- */
+
+.player-extras {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.player-extras label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.player-extras select {
+  width: auto;
+  min-width: 11rem;
+  background: var(--surface);
+}
+
+/* --- Timeline tools ------------------------------------------------------- */
+
+.timeline-tools {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+
+.timeline-filter {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.timeline-filter label {
+  margin-bottom: 0.3rem;
+  font-size: 0.88rem;
+}
+
+.timeline-export {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.timeline-export button {
+  min-height: 42px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.88rem;
+}
+
+.timeline-filter-count {
+  margin: 0.6rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .timeline-export {
+    width: 100%;
+  }
+  .timeline-export button {
+    flex: 1;
+  }
+}
+/* --- Motion --------------------------------------------------------------- *
+ * Every animation here is decoration: it makes the page feel alive and tells a
+ * sighted learner that something is still working. None of it carries meaning
+ * on its own, and the `prefers-reduced-motion` block above switches all of it
+ * off with `animation: none !important`, so the interface stays complete for
+ * anyone who cannot tolerate movement.
+ */
+
+/* The mark breathes, the way the illustration on a course page does. */
+@keyframes mark-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(1deg);
+  }
+}
+
+/* A slow drift across the progress stripe: motion means "still working", where
+   a static bar at 40% is indistinguishable from a stalled one. */
+@keyframes progress-drift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 200% 50%;
   }
 }
